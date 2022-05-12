@@ -85,13 +85,17 @@ package fr.ubordeaux.arduinoCode;
     
 %}
 
-Integer = [[:digit:]]+
+
+Integer = ([[:digit:]]+) | "B"[0-1]+ | "0x"(([0-9] | [A-F])+)
+
 Decimal = {Integer} (\. {Integer})?
 Float = {Decimal} ([Ee][+-]?{Integer})?
 Identifier = [a-zA-Z_][a-zA-Z0-9_]*
 String = \" ~\"
 CommentLines = "/*"~"*/" 
 CommentLine = "//".* 
+
+
 
 %%
 /* OPERATORS, SEPARATORS */
@@ -201,7 +205,12 @@ CommentLine = "//".*
 "PIN_A"[0-5]			{ return makeToken(PIN, Integer.parseInt(yytext().substring(5))+14); }
 
 /* FREE TOKENS */
-{Integer}		{ return makeToken(INTEGER, Long.parseLong(yytext())); }
+{Integer}		{
+	String number = yytext();
+	if ( number.charAt(0) == ('B') )  {System.err.printf("*** aaaaaaaaaaaaaaaaaaaaaaa", yyline+1, yycolumn+1); return makeToken(INTEGER, Long.parseLong(yytext().substring(1),2)); }
+	else if (number.charAt(0) == ('0') && number.charAt(1) == ('x') ) return makeToken(INTEGER, Long.parseLong(yytext().substring(2),16)); 
+	else return makeToken(INTEGER, Long.parseLong(yytext())); 
+	}
 {Float}			{ return makeToken(FLOAT, Float.parseFloat(yytext())); }
 {Identifier}	{ return makeToken(IDENTIFIER, yytext()); }
 {String}		{ return makeToken(STRING, yytext().substring(1, yytext().length()-1)); }
