@@ -48,6 +48,12 @@ public class CheckTypeVisitor extends ConcreteVisitor {
 	}
 
 	@Override
+	public void visit(StmWHILE stmWHILE) throws Exception {
+		System.err.println("*** visit(StmIF) with " + this);
+		stmWHILE.getExpr().getType().attestBoolean();
+	}
+
+	@Override
 	public String toString() {
 		return name;
 	}

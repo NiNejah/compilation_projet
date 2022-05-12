@@ -528,6 +528,7 @@ stm:
  	| "continue" ';' { trace("*** REDUCE: stm -> \"continue\" \';\'"); $$ = new StmBREAK();}
  	| "return" expression ';' { trace("*** REDUCE: stm -> \"return\" expression \';\'"); $$ = new StmRETURN($2);}
 	| '{' list_of_stms '}' { trace("*** REDUCE: stm -> '{' list_of_stms '}'"); $$ = new StmSeq($2); }
+	| "while" '(' expression ')' stm { trace("*** REDUCE: stm -> while expr stm"); $$ = new StmWHILE($3, $5);}
 	;
 
 // contenu d'un switch

@@ -95,8 +95,6 @@ String = \" ~\"
 CommentLines = "/*"~"*/" 
 CommentLine = "//".* 
 
-
-
 %%
 /* OPERATORS, SEPARATORS */
 ":"	{ return makeToken(':'); }
@@ -207,7 +205,7 @@ CommentLine = "//".*
 /* FREE TOKENS */
 {Integer}		{
 	String number = yytext();
-	if ( number.charAt(0) == ('B') )  {System.err.printf("*** aaaaaaaaaaaaaaaaaaaaaaa", yyline+1, yycolumn+1); return makeToken(INTEGER, Long.parseLong(yytext().substring(1),2)); }
+	if ( number.charAt(0) == ('B') )  { return makeToken(INTEGER, Long.parseLong(yytext().substring(1),2)); }
 	else if (number.charAt(0) == ('0') && number.charAt(1) == ('x') ) return makeToken(INTEGER, Long.parseLong(yytext().substring(2),16)); 
 	else return makeToken(INTEGER, Long.parseLong(yytext())); 
 	}

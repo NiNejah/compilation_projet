@@ -132,5 +132,11 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 		return "Ajoute du code AVR Assembler aux variables sectionFLASHData et\n//\tsectionSRAMData";
 	}
 
+	@Override
+	public void visit(StmWHILE stmWHILE) throws Exception{
+		System.err.println("*** visit(ExprWhile) withDataGeneratorVisitor");
+		stmWHILE.getStm().accept(this);
+	}
+
 
 }
