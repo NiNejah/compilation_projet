@@ -54,6 +54,13 @@ public class CheckTypeVisitor extends ConcreteVisitor {
 	}
 
 	@Override
+	public void visit(ExprLIST exprList) throws Exception {
+		exprList.accept(this);
+	}
+
+
+
+	@Override
 	public String toString() {
 		return name;
 	}

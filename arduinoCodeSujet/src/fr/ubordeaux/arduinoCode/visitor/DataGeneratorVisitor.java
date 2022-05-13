@@ -29,7 +29,7 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 		case UINT8_T:
 		case PIN:
 		case INT16_T:
-		case UINT16_T:
+		case UINT16_T: 
 		case INT32_T:
 		case UINT32_T:
 		case F32_T:
@@ -54,7 +54,7 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 	//
 	@Override
 	public void visit(ExprCONSTANT expr) {
-		System.err.println("*** visit(ExprCONSTANT (" + expr.getType().getTag() + ") with " + this);
+		System.err.println("*** visit(ExprCONSTANT (" + expr.getType().getTag() + ") with " + this + "rmq: "+expr.getValue());
 		switch (expr.getType().getTag()) {
 		// La constante string est réservée dans l'espace FLASH
 		case STRING:
@@ -135,8 +135,22 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 	@Override
 	public void visit(StmWHILE stmWHILE) throws Exception{
 		System.err.println("*** visit(ExprWhile) withDataGeneratorVisitor");
+		stmWHILE.getExpr().accept(this);
 		stmWHILE.getStm().accept(this);
 	}
 
+	@Override
+	public void visit(ExprUnary object) throws Exception {
+		System.err.println("*** visit(ExprUnary) withDataGeneratorVisitor");
+		object.getExpr().accept(this);
+	 }
+
+
+	 @Override
+	 public void visit(ExprLIST exprList) throws Exception{
+		 System.err.println("*** visit(exprList) withDataGeneratorVisitor");
+		 sectionFLASHData +=  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
+		 sectionSRAMData +=  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
+	 }
 
 }

@@ -1,6 +1,7 @@
 package fr.ubordeaux.arduinoCode.visitor;
 
 import fr.ubordeaux.arduinoCode.ast.*;
+import fr.ubordeaux.arduinoCode.ast.ExprBinary.Op;
 import fr.ubordeaux.arduinoCode.type.Type;
 
 public class CodeGeneratorVisitor extends ConcreteVisitor {
@@ -263,9 +264,9 @@ public class CodeGeneratorVisitor extends ConcreteVisitor {
 	// Effect: sectionText contient le code
 	@Override
 	public void visit(ExprBinary expr) throws Exception {
-		System.err.println("*** visit(ExprBinary) with " + this);
+		System.err.println("*** visit(ExprBinary) with " + this + "AAAA" + expr.getOp());
 		int savedRegisterCt = currentRegisterCt;
-		expr.getLeft().accept(this);
+		expr.getLeft().accept(this); 	
 		currentRegisterCt += expr.getLeft().getType().size();
 		expr.getRight().accept(this);
 		switch (expr.getOp()) {
@@ -273,10 +274,35 @@ public class CodeGeneratorVisitor extends ConcreteVisitor {
 			sectionText += "	cp " + register(expr.getLeft().getRegister()) + ","
 					+ register(expr.getRight().getRegister()) + "\n";
 			break;
+
+		case NE:
+			sectionText += "	cp " + register(expr.getLeft().getRegister()) + ","
+					+ register(expr.getRight().getRegister()) + "\n";
+			sectionText += "    brne .Ltmp   ;; branch if not equal\n";
+			break;
 		case PLUS:
 			sectionText += "	add " + register(expr.getLeft().getRegister()) + "," + register(expr.getRight().getRegister()) + "\n";
 			expr.setRegister(expr.getLeft().getRegister());
 			break;
+		case LT:
+		case GT:
+		case GE:
+		case LE:
+			String val;
+			if (expr.getOp().equals(Op.LT)) val = register(expr.getRight().getRegister());
+			else val = register(expr.getLeft().getRegister());
+			
+			int register;
+			if (expr.getOp().equals(Op.LT)) register = expr.getLeft().getRegister();
+			else register = expr.getRight().getRegister();
+			
+			if (expr.getOp().equals(Op.LT) || expr.getOp().equals(Op.GT)) sectionText += "	add " + val + "," + "1" + "\n";
+			sectionText += "    sbiw "+ register(register) + "," + (val) +" ;; on soustrait\n";
+			sectionText += "    cpc "+ register(register+2) +",__zero_reg__	 ;; 0\n";
+			sectionText += "    cpc "+ register(register+3) +",__zero_reg__	 ;; 0\n";
+			sectionText += "    brsh .Ltmp   ;; branch if same or higher\n";
+			break;
+
 		default:
 			sectionText += ";; Unimplemented (CodeGeneratorVisitor.java line 300))" + "\n";
 			break;
@@ -507,6 +533,36 @@ public class CodeGeneratorVisitor extends ConcreteVisitor {
 	@Override
 	public String getEffect() {
 		return "Ajoute du code AVR Assembler à la variable\n//\tsectionText";
+	}
+
+	@Override
+	public void visit(StmWHILE stmWHILE) throws Exception{
+		System.err.println("*** visit(stmWHILE) with " + this);
+
+
+		sectionText += "	rjmp .L"+ stmWHILE.getId() + ":\n";
+		sectionText += ".L"+ (Integer.valueOf(stmWHILE.getId())+1) + "\n";
+		
+		sectionText += ".L"+ stmWHILE.getId() + "\n";
+
+		sectionText += "    ldi r18,1   ;; val bool dans r18\n";
+		stmWHILE.getExpr().accept(this);
+
+
+		sectionText += "    ldi r18,0		;; r18 à 0 (faux)\n";
+		sectionText += ".Ltmp \n";
+
+		sectionText += "    tst r18   ;; test si r18 vaut vrai\n";
+		sectionText += "	brne .L"+(Integer.valueOf(stmWHILE.getId())+1)+"; - Branch if same or higher\n";
+
+	}
+
+	@Override
+	public void visit(ExprLIST ExprList) throws Exception{
+		System.err.println("*** visit(ExprLIST) with " + this);
+		sectionText+=";;; test\n";
+
+
 	}
 
 }
