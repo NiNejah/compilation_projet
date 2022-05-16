@@ -2,6 +2,8 @@ package fr.ubordeaux.arduinoCode.visitor;
 
 import fr.ubordeaux.arduinoCode.ast.*;
 import fr.ubordeaux.arduinoCode.type.TypeException;
+import fr.ubordeaux.arduinoCode.type.TypeTree;
+import fr.ubordeaux.arduinoCode.type.Type;
 
 public class CheckTypeVisitor extends ConcreteVisitor {
 
@@ -15,9 +17,11 @@ public class CheckTypeVisitor extends ConcreteVisitor {
 	@Override
 	public void visit(StmAFF stm) throws TypeException {
 		System.err.println("*** visit(Stm) with " + this);
-		System.err.println("*** Unimplemented (CheckTypeVisitor.java line 18))");
 		//stm.getLeft().getType().attestEquivalentTo(stm.getRight().getType());
-		stm.getRight().setType(stm.getLeft().getType());
+		// stm.getRight().setType(stm.getLeft().getType());
+ 		if (stm.getLeft().getType() == null) stm.getLeft().setType(new TypeTree(Type.Tag.LIST)); /// C'est une liste.
+		else stm.getRight().setType(stm.getLeft().getType());
+		System.err.println("*** Types de stm:  " + stm.getRight().getType() + "   " + stm.getLeft().getType());
 	}
 
 	@Override
@@ -44,20 +48,14 @@ public class CheckTypeVisitor extends ConcreteVisitor {
 	@Override
 	public void visit(ExprUnary expr) throws Exception {
 		System.err.println("*** visit(ExprUnary) with " + this);
-		System.err.println("*** Unimplemented (CheckTypeVisitor.java line 47))");
 	}
 
 	@Override
 	public void visit(StmWHILE stmWHILE) throws Exception {
 		System.err.println("*** visit(StmIF) with " + this);
 		stmWHILE.getExpr().getType().attestBoolean();
+		stmWHILE.getExpr().accept(this);
 	}
-
-	@Override
-	public void visit(ExprLIST exprList) throws Exception {
-		exprList.accept(this);
-	}
-
 
 
 	@Override
@@ -74,5 +72,8 @@ public class CheckTypeVisitor extends ConcreteVisitor {
 	public String getEffect() {
 		return "Déclanche une exception de type TypeException";
 	}
+
+	
+
 
 }

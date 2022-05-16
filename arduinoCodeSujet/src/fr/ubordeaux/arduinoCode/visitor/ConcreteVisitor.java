@@ -143,4 +143,11 @@ public abstract class ConcreteVisitor implements Visitor {
 		warningUnimplementedVisitOverloading(exprRANGE);
 	}
 
+
+	//////
+	@Override
+	public void visit(ExprGET exprGET) throws Exception {
+		warningUnimplementedVisitOverloading(exprGET);
+	}
+
 }

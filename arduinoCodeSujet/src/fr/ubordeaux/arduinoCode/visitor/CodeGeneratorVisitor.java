@@ -457,6 +457,18 @@ public class CodeGeneratorVisitor extends ConcreteVisitor {
 			sectionText += "	sts " + ((ExprVAR) stm.getLeft()).getName() + "+2, " + currentRegister(2) + "\n";
 			sectionText += "	sts " + ((ExprVAR) stm.getLeft()).getName() + "+3, " + currentRegister(3) + "\n";
 			break;
+		case LIST:
+			int size = Type.sizeMap.get(stm.getRight().getType().getTag());
+			ExprGET test = (ExprGET) stm.getLeft();
+			ExprVAR test2 = (ExprVAR) test.getIndex();
+			// Ne fonctionne que pour t[a], et non t[expr]
+			ExprCONSTANT test3 = (ExprCONSTANT) test.getExpr();
+			sectionText +="	sts "+  test2.getName() + "+" + (Long) test3.getValue()*size + "," + currentRegister() + "\n"  ;
+			sectionText +="	sts "+  test2.getName() + "+" + (Long) test3.getValue()*size + "+1" + "," + currentRegister(1) + "\n"  ;
+			sectionText +="	sts "+  test2.getName() + "+" + (Long) test3.getValue()*size + "+2" + "," + currentRegister(2) + "\n"  ;
+			sectionText +="	sts "+  test2.getName() + "+" + (Long) test3.getValue()*size + "+3" + "," + currentRegister(3) + "\n"  ;
+			/// test2.getName() = nom de la variable
+			break;
 		default:
 			sectionText += ";; Unimplemented (CodeGeneratorVisitor.java line 435)\n";
 			break;
@@ -542,6 +554,7 @@ public class CodeGeneratorVisitor extends ConcreteVisitor {
 
 		sectionText += "	rjmp .L"+ stmWHILE.getId() + ":\n";
 		sectionText += ".L"+ (Integer.valueOf(stmWHILE.getId())+1) + "\n";
+		stmWHILE.getStm().accept(this);
 		
 		sectionText += ".L"+ stmWHILE.getId() + "\n";
 
@@ -558,11 +571,10 @@ public class CodeGeneratorVisitor extends ConcreteVisitor {
 	}
 
 	@Override
-	public void visit(ExprLIST ExprList) throws Exception{
-		System.err.println("*** visit(ExprLIST) with " + this);
-		sectionText+=";;; test\n";
-
-
+	public void visit(ExprGET test) throws Exception{
+		System.err.println("*** visit(exprGET) with " + this);
+		sectionText += "	AAAAAAAAAA CA MARCHE!!!!!!!!" + ":\n";
 	}
+
 
 }

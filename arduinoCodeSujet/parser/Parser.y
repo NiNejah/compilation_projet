@@ -51,9 +51,9 @@
   // Argument: Message à afficher
   private void trace(String message) {
 	  // uncomment the following line to trace
-	  /***
+
 	  System.err.println(message);
-	  ***/
+
 	}
 
 }
@@ -446,7 +446,7 @@ list_of_parameters:
 parameter:
 	IDENTIFIER ':' type { 
 		trace("*** REDUCE: parameter -> IDENTIFIER \':\' type "); 
-		$$ = new TypeTree(Type.Tag.FIELD, $1, $3); 
+		$$ = new TypeFIELD($1, $3); 
 	}
 	;
 
@@ -510,7 +510,7 @@ number:
 stm:
 	left_part "++" ';' { trace("*** REDUCE: stm -> left_part \"++\""); $$ = new StmExpr(new ExprUnary(ExprUnary.Op.PP, $1.getType(), $1)); }
 	| left_part "--" ';' { trace("*** REDUCE: stm -> left_part \"--\""); $$ = new StmExpr(new ExprUnary(ExprUnary.Op.MM, $1.getType(), $1)); }
-	| left_part '=' expression ';' { trace("*** REDUCE: stm -> left_part \'=\' expression \';\'"); $$ = new StmAFF($1, $3); }
+	| left_part '=' expression ';' { trace("*** REDUCE: stm -> left_part \'=\' expression \';\'"); $$ = new StmAFF($1, $3); trace("*** ICI'" + $3); }
 	| left_part "+=" expression ';' { trace("*** REDUCE: stm -> left_part \"+=\" expression \';\'"); $$ = new StmAFF(StmAFF.Op.PLUS, $1, $3); }
 	| left_part "-=" expression ';' { trace("*** REDUCE: stm -> left_part \"-=\" expression \';\'"); $$ = new StmAFF(StmAFF.Op.MINUS, $1, $3);}
 	| left_part "*=" expression ';' { trace("*** REDUCE: stm -> left_part \"*=\" expression \';\'"); $$ = new StmAFF(StmAFF.Op.MUL, $1, $3);}

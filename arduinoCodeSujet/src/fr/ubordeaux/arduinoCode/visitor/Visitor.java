@@ -46,4 +46,9 @@ public interface Visitor {
 
 	void visit(ExprRANGE exprRANGE) throws Exception;;
 
+
+	/////
+	void visit(ExprGET exprGET) throws Exception;;
+
+
 }

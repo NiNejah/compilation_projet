@@ -2,6 +2,8 @@ package fr.ubordeaux.arduinoCode.visitor;
 
 
 import fr.ubordeaux.arduinoCode.ast.*;
+import fr.ubordeaux.arduinoCode.type.Type;
+import fr.ubordeaux.arduinoCode.type.Type.Tag;
 
 public class DataGeneratorVisitor extends ConcreteVisitor {
 
@@ -36,6 +38,11 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 				sectionSRAMData += "	;; Déclaration de la variable " + declVar.getName() + " sur " + declVar.size() + " octets \n"; 
 				sectionSRAMData += "	.comm " + declVar.getName() + ", " + declVar.size() + "\n"; 
 			break;
+		case LIST:
+				int size = Type.sizeMap.get(declVar.getType().getLeft().getTag());
+				sectionSRAMData += "	;; Déclaration de la variable " + declVar.getName() + " de type " + declVar.getType().getLeft().getTag() + " sur " + size*128 + " octets \n"; 
+				sectionSRAMData += "	.comm " + declVar.getName() + ", " + size*128 + "\n"; 
+				break;
 		default:
 			sectionSRAMData += ";; Unimplemented  (CodeGeneratorVisitor.java line 348))\n"; 
 			break;
@@ -54,7 +61,7 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 	//
 	@Override
 	public void visit(ExprCONSTANT expr) {
-		System.err.println("*** visit(ExprCONSTANT (" + expr.getType().getTag() + ") with " + this + "rmq: "+expr.getValue());
+		System.err.println("*** visit(ExprCONSTANT (" + expr.getType().getTag() + ") with " + this + "rmq: "+ expr.getValue());
 		switch (expr.getType().getTag()) {
 		// La constante string est réservée dans l'espace FLASH
 		case STRING:
@@ -74,8 +81,12 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 	// Effect: Ajoute du code AVR Assembler aux variables sectionFLASHData et
 	//		sectionSRAMData
 	public void visit(StmAFF object) throws Exception {
-	   System.err.println("*** visit(StmAFF) withDataGeneratorVisitor");
-	   object.getRight().accept(this);
+	   System.err.println("*** visit(StmAFF) withDataGeneratorVisitor" + object.getRight().getType());
+	   object.getRight().accept(this); 
+	   
+	   object.getLeft().accept(this);
+	   System.err.println("*** Val index: " + (ExprGET) object.getLeft());
+
 	}
 
 	// Purpose: Produit la partie data (en FLASH pour les constantes et
@@ -145,12 +156,14 @@ public class DataGeneratorVisitor extends ConcreteVisitor {
 		object.getExpr().accept(this);
 	 }
 
-
 	 @Override
-	 public void visit(ExprLIST exprList) throws Exception{
-		 System.err.println("*** visit(exprList) withDataGeneratorVisitor");
-		 sectionFLASHData +=  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
-		 sectionSRAMData +=  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
-	 }
+	 public void visit(ExprGET object) throws Exception {
+		 System.err.println("*** visit(ExprGET) withDataGeneratorVisitor");
+	  }
+
+
+
+
+
 
 }
